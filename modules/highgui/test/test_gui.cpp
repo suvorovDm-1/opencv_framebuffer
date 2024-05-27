@@ -41,6 +41,7 @@
 //M*/
 
 #include "test_precomp.hpp"
+#include <opencv2/core/utils/logger.hpp>
 
 namespace opencv_test { namespace {
 
@@ -65,6 +66,7 @@ TEST(Highgui_GUI, DISABLED_regression)
 TEST(Highgui_GUI, regression)
 #endif
 {
+    cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_VERBOSE);
     const std::string window_name("opencv_highgui_test_window");
     const cv::Size image_size(800, 600);
 
