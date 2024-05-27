@@ -11,15 +11,24 @@
 
 namespace cv { namespace highgui_backend {
 
+enum OpenCVFBMode{
+  FB_MODE_EMU,
+  FB_MODE_FB,
+  FB_MODE_XVFB
+};
+
 class FramebufferBackend;
 class CV_EXPORTS FramebufferWindow : public UIWindow
 {
   FramebufferBackend &backend;
   std::string FB_ID;
   Rect windowRect;
+  
+  int flags;
+  Mat currentImg;
 
 public:
-  FramebufferWindow(FramebufferBackend &backend);
+  FramebufferWindow(FramebufferBackend &backend, int flags);
   virtual ~FramebufferWindow();
 
   virtual void imshow(InputArray image)override;
@@ -54,8 +63,7 @@ public:
 
 class CV_EXPORTS FramebufferBackend: public UIBackend
 {
-//  int OpenInputEvent();
-//  int eventKey;
+  OpenCVFBMode mode;
 
   struct termios old, current;
 
@@ -75,11 +83,17 @@ class CV_EXPORTS FramebufferBackend: public UIBackend
   int fbLineLength;
   long int fbScreenSize;
   unsigned char* fbPointer;
+  unsigned int fbPointer_dist;
   Mat backgroundBuff;
 
   
   int fbOpenAndGetInfo();
   int fbID;
+
+  unsigned int xvfb_len_header;
+  unsigned int xvfb_len_colors;
+  unsigned int xvfb_len_pixmap;
+  int XvfbOpenAndGetInfo();
   
 public:
 
@@ -94,6 +108,7 @@ public:
   int getFBLineLength();
   unsigned char* getFBPointer();
   Mat& getBackgroundBuff();
+  OpenCVFBMode getMode();
 
   FramebufferBackend();
 
@@ -105,7 +120,7 @@ public:
   virtual std::shared_ptr<UIWindow> createWindow(
       const std::string& winname,
       int flags
-  );
+  )override;
 
   virtual int waitKeyEx(int delay /*= 0*/)override;
   virtual int pollKey() override; 
